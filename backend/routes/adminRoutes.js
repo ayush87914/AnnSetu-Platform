@@ -5,6 +5,7 @@ const {
   getPendingUsers, 
   getAllUsers, 
   updateUserStatus, 
+  getUserDetails,
   getDashboardStats 
 } = require('../controllers/adminController');
 
@@ -13,6 +14,7 @@ router.use(protect, isAdmin);
 
 router.get('/pending-users', getPendingUsers);
 router.get('/all-users', getAllUsers);
+router.get('/user/:userId', getUserDetails);
 router.patch('/update-status/:userId', updateUserStatus);
 router.get('/dashboard-stats', getDashboardStats);
 

@@ -17,13 +17,14 @@ exports.getPendingUsers = async (req, res) => {
   }
 };
 
-// ============ GET ALL USERS (any status) ============
+// ============ GET ALL USERS (any status, with optional filters) ============
 exports.getAllUsers = async (req, res) => {
   try {
-    const { role } = req.query; // optional filter: ?role=restaurant
+    const { role, status } = req.query; // optional filters: ?role=restaurant&status=approved
 
     const filter = { role: { $ne: 'admin' } };
     if (role) filter.role = role;
+    if (status) filter.status = status;
 
     const users = await User.find(filter).select('-password');
 
@@ -35,14 +36,14 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// ============ APPROVE / REJECT USER ============
+// ============ APPROVE / REJECT USER (also used to revoke approval) ============
 exports.updateUserStatus = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { status } = req.body; // 'approved' or 'rejected'
+    const { status } = req.body; // 'approved', 'rejected', or 'pending' (revoke)
 
-    if (!['approved', 'rejected'].includes(status)) {
-      return res.status(400).json({ message: 'Status must be approved or rejected' });
+    if (!['approved', 'rejected', 'pending'].includes(status)) {
+      return res.status(400).json({ message: 'Status must be approved, rejected, or pending' });
     }
 
     const user = await User.findById(userId);
@@ -63,6 +64,20 @@ exports.updateUserStatus = async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email, status: user.status } 
     });
 
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// ============ GET SINGLE USER DETAILS ============
+exports.getUserDetails = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error', error: error.message });

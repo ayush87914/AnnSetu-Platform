@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, Plus, Package, Clock, MapPin, Phone, LogOut, X, CheckCircle2 } from 'lucide-react';
+import { Leaf, Plus, Package, Clock, MapPin, Phone, LogOut, X, CheckCircle2, User, Mail, ShieldCheck, Image as ImageIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -25,9 +25,11 @@ export default function RestaurantDashboard() {
   const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [imagePreview, setImagePreview] = useState('');
 
   const [formData, setFormData] = useState({
     foodName: '',
@@ -39,6 +41,7 @@ export default function RestaurantDashboard() {
     latitude: '',
     longitude: '',
     contactNumber: '',
+    foodImage: '',
   });
 
   const token = localStorage.getItem('token');
@@ -71,6 +74,23 @@ export default function RestaurantDashboard() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Image size should be under 2MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData((prev) => ({ ...prev, foodImage: reader.result }));
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const useMyLocation = () => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition((pos) => {
@@ -92,9 +112,10 @@ export default function RestaurantDashboard() {
       await axios.post('http://localhost:5000/api/donations/create', formData, authHeader);
       setMessage('Food donation posted successfully!');
       setShowForm(false);
+      setImagePreview('');
       setFormData({
         foodName: '', foodType: 'veg', quantity: '', cookingTime: '', expiryTime: '',
-        pickupAddress: '', latitude: '', longitude: '', contactNumber: '',
+        pickupAddress: '', latitude: '', longitude: '', contactNumber: '', foodImage: '',
       });
       fetchDonations();
     } catch (err) {
@@ -125,7 +146,7 @@ export default function RestaurantDashboard() {
 
       <div className="relative z-10 max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center gap-2">
+          <button onClick={() => setShowProfile(true)} className="flex items-center gap-2 text-left">
             <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
               <Leaf size={18} className="text-primary" />
             </div>
@@ -133,9 +154,9 @@ export default function RestaurantDashboard() {
               <div className="font-display text-lg font-semibold text-textmain leading-tight">
                 Anna<span className="text-primary">Setu</span>
               </div>
-              <div className="text-xs text-textmuted">Welcome back, {user.name}</div>
+              <div className="text-xs text-textmuted">Welcome back, {user.name} • View profile</div>
             </div>
-          </div>
+          </button>
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/15 text-sm text-textmuted hover:text-textmain hover:border-white/30 transition-all"
@@ -175,6 +196,23 @@ export default function RestaurantDashboard() {
                 {error}
               </div>
             )}
+
+            <div>
+              <label className="text-xs text-textmuted mb-2 block">Food photo (optional, max 2MB)</label>
+              <div className="flex items-center gap-4">
+                {imagePreview ? (
+                  <img src={imagePreview} alt="preview" className="w-20 h-20 rounded-xl object-cover border border-white/10" />
+                ) : (
+                  <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                    <ImageIcon size={22} className="text-textmuted" />
+                  </div>
+                )}
+                <input
+                  type="file" accept="image/*" onChange={handleImageChange}
+                  className="text-sm text-textmuted file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-primary/15 file:text-primary file:text-sm hover:file:bg-primary/25 file:cursor-pointer cursor-pointer"
+                />
+              </div>
+            </div>
 
             <div className="grid md:grid-cols-2 gap-4">
               <input
@@ -273,9 +311,17 @@ export default function RestaurantDashboard() {
                 key={d._id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl bg-white/[0.03] border border-white/10 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                className="rounded-2xl bg-white/[0.03] border border-white/10 p-5 flex flex-col md:flex-row md:items-center gap-4"
               >
-                <div>
+                {d.foodImage ? (
+                  <img src={d.foodImage} alt={d.foodName} className="w-20 h-20 rounded-xl object-cover border border-white/10 flex-shrink-0" />
+                ) : (
+                  <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                    <Package size={22} className="text-textmuted" />
+                  </div>
+                )}
+
+                <div className="flex-1">
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="text-textmain font-medium">{d.foodName}</h3>
                     <span className={'text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ' + statusColors[d.status]}>
@@ -293,7 +339,7 @@ export default function RestaurantDashboard() {
                 {d.status === 'pending' && (
                   <button
                     onClick={() => handleCancel(d._id)}
-                    className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-all w-fit"
+                    className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-all w-fit flex-shrink-0"
                   >
                     Cancel
                   </button>
@@ -303,6 +349,42 @@ export default function RestaurantDashboard() {
           )}
         </div>
       </div>
+
+      {showProfile && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setShowProfile(false)}
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-6"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-2xl bg-surface border border-white/10 p-6"
+          >
+            <div className="flex items-start justify-between mb-5">
+              <h3 className="font-display text-xl text-textmain">My Profile</h3>
+              <button onClick={() => setShowProfile(false)} className="text-textmuted hover:text-textmain">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-3 text-sm">
+              <div className="flex items-center gap-2 text-textmuted">
+                <User size={14} /> {user.name}
+              </div>
+              <div className="flex items-center gap-2 text-textmuted">
+                <Mail size={14} /> {user.email}
+              </div>
+              <div className="flex items-center gap-2 text-textmuted">
+                <ShieldCheck size={14} className="text-primary" />
+                Status: <span className="text-primary capitalize">{user.status || 'approved'}</span>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }
