@@ -6,6 +6,8 @@ import HowItWorks from './components/HowItWorks';
 import Footer from './components/Footer';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import VerifyOtp from './pages/VerifyOtp';
+import AdminDashboard from './pages/AdminDashboard';
 
 function LandingPage() {
   return (
@@ -26,6 +28,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
     </div>
   );
