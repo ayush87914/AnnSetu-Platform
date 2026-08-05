@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import VerifyOtp from './pages/VerifyOtp';
 import AdminDashboard from './pages/AdminDashboard';
+import RestaurantDashboard from './pages/RestaurantDashboard';
 
 function LandingPage() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
       </Routes>
     </div>
   );
