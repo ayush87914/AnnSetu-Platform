@@ -57,6 +57,7 @@ const foodDonationSchema = new mongoose.Schema({
 
   // Delivery proof
   deliveryProofImage: { type: String },
+  pickupOTP: { type: String },
   deliveryOTP: { type: String },
   isDelivered: { type: Boolean, default: false },
   deliveredAt: { type: Date },

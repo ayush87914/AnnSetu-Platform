@@ -387,3 +387,76 @@ exports.getMyVolunteerTasks = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+// ============ GENERATE PICKUP OTP (Restaurant generates when volunteer arrives) ============
+exports.generatePickupOTP = async (req, res) => {
+  try {
+    const donation = await FoodDonation.findById(req.params.id);
+
+    if (!donation) {
+      return res.status(404).json({ message: 'Donation not found' });
+    }
+
+    if (donation.donor.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'You can only generate OTP for your own donations' });
+    }
+
+    if (donation.status !== 'accepted') {
+      return res.status(400).json({ message: 'Donation must be accepted by NGO and have a volunteer assigned first' });
+    }
+
+    if (!donation.assignedVolunteer) {
+      return res.status(400).json({ message: 'No volunteer assigned yet' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    donation.pickupOTP = otp;
+    await donation.save();
+
+    res.status(200).json({
+      message: 'Pickup OTP generated. Share this with the volunteer to confirm pickup.',
+      otp
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// ============ VERIFY PICKUP OTP (Volunteer enters OTP given by restaurant) ============
+exports.verifyPickupOTP = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const donation = await FoodDonation.findById(req.params.id);
+
+    if (!donation) {
+      return res.status(404).json({ message: 'Donation not found' });
+    }
+
+    if (donation.assignedVolunteer.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'You are not assigned to this donation' });
+    }
+
+    if (donation.status !== 'accepted') {
+      return res.status(400).json({ message: 'Invalid status for pickup verification' });
+    }
+
+    if (!donation.pickupOTP) {
+      return res.status(400).json({ message: 'Restaurant has not generated a pickup OTP yet' });
+    }
+
+    if (donation.pickupOTP !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    donation.status = 'picked_up';
+    donation.pickupOTP = undefined;
+    await donation.save();
+
+    res.status(200).json({ message: 'Pickup verified successfully!', donation });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

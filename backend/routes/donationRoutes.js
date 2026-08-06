@@ -15,7 +15,9 @@ const {
   markPickedUp,
   generateDeliveryOTP,
   confirmDelivery,
-  getMyVolunteerTasks
+  getMyVolunteerTasks,
+  generatePickupOTP,
+  verifyPickupOTP
 } = require('../controllers/donationController');
 
 router.use(protect);
@@ -24,6 +26,7 @@ router.use(protect);
 router.post('/create', checkRole('restaurant'), createDonation);
 router.get('/my-donations', checkRole('restaurant'), getMyDonations);
 router.patch('/cancel/:id', checkRole('restaurant'), cancelDonation);
+router.post('/generate-pickup-otp/:id', checkRole('restaurant'), generatePickupOTP);
 
 // NGO routes
 router.get('/available/nearby', checkRole('ngo'), getAvailableDonations);
@@ -37,6 +40,7 @@ router.patch('/volunteer/assign/:id', checkRole('volunteer'), assignVolunteer);
 router.patch('/volunteer/picked-up/:id', checkRole('volunteer'), markPickedUp);
 router.post('/volunteer/generate-otp/:id', checkRole('volunteer'), generateDeliveryOTP);
 router.get('/volunteer/my-tasks', checkRole('volunteer'), getMyVolunteerTasks);
+router.patch('/volunteer/verify-pickup-otp/:id', checkRole('volunteer'), verifyPickupOTP);
 
 // Common (dono access kar sakte hain)
 router.get('/:id', getDonationById);

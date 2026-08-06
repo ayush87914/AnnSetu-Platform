@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, Plus, Package, Clock, MapPin, Phone, LogOut, X, CheckCircle2, User, Mail, ShieldCheck, Image as ImageIcon } from 'lucide-react';
+import { Leaf, Plus, Package, Clock, MapPin, Phone, LogOut, X, CheckCircle2, User, Mail, ShieldCheck, Image as ImageIcon, KeyRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -30,6 +30,9 @@ export default function RestaurantDashboard() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [imagePreview, setImagePreview] = useState('');
+  const [otpModal, setOtpModal] = useState(null);
+  const [generatedOtp, setGeneratedOtp] = useState('');
+  const [otpLoading, setOtpLoading] = useState(null);
 
   const [formData, setFormData] = useState({
     foodName: '',
@@ -131,6 +134,20 @@ export default function RestaurantDashboard() {
       fetchDonations();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to cancel');
+    }
+  };
+
+  const handleGeneratePickupOtp = async (donation) => {
+    setOtpLoading(donation._id);
+    setMessage('');
+    try {
+      const res = await axios.post('http://localhost:5000/api/donations/generate-pickup-otp/' + donation._id, {}, authHeader);
+      setGeneratedOtp(res.data.otp);
+      setOtpModal(donation);
+    } catch (err) {
+      setMessage(err.response?.data?.message || 'Failed to generate OTP');
+    } finally {
+      setOtpLoading(null);
     }
   };
 
@@ -311,44 +328,94 @@ export default function RestaurantDashboard() {
                 key={d._id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl bg-white/[0.03] border border-white/10 p-5 flex flex-col md:flex-row md:items-center gap-4"
+                className="rounded-2xl bg-white/[0.03] border border-white/10 p-5 flex flex-col gap-4"
               >
-                {d.foodImage ? (
-                  <img src={d.foodImage} alt={d.foodName} className="w-20 h-20 rounded-xl object-cover border border-white/10 flex-shrink-0" />
-                ) : (
-                  <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                    <Package size={22} className="text-textmuted" />
-                  </div>
-                )}
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                  {d.foodImage ? (
+                    <img src={d.foodImage} alt={d.foodName} className="w-20 h-20 rounded-xl object-cover border border-white/10 flex-shrink-0" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                      <Package size={22} className="text-textmuted" />
+                    </div>
+                  )}
 
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-textmain font-medium">{d.foodName}</h3>
-                    <span className={'text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ' + statusColors[d.status]}>
-                      {statusLabels[d.status]}
-                    </span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="text-textmain font-medium">{d.foodName}</h3>
+                      <span className={'text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full ' + statusColors[d.status]}>
+                        {statusLabels[d.status]}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-textmuted">
+                      <span className="flex items-center gap-1"><Package size={12} /> {d.quantity}</span>
+                      <span className="flex items-center gap-1"><MapPin size={12} /> {d.pickupAddress}</span>
+                      <span className="flex items-center gap-1"><Phone size={12} /> {d.contactNumber}</span>
+                      <span className="flex items-center gap-1"><Clock size={12} /> Expires {new Date(d.expiryTime).toLocaleString()}</span>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-textmuted">
-                    <span className="flex items-center gap-1"><Package size={12} /> {d.quantity}</span>
-                    <span className="flex items-center gap-1"><MapPin size={12} /> {d.pickupAddress}</span>
-                    <span className="flex items-center gap-1"><Phone size={12} /> {d.contactNumber}</span>
-                    <span className="flex items-center gap-1"><Clock size={12} /> Expires {new Date(d.expiryTime).toLocaleString()}</span>
-                  </div>
+
+                  {d.status === 'pending' && (
+                    <button
+                      onClick={() => handleCancel(d._id)}
+                      className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-all w-fit flex-shrink-0"
+                    >
+                      Cancel
+                    </button>
+                  )}
                 </div>
 
-                {d.status === 'pending' && (
+                {d.status === 'accepted' && d.assignedVolunteer && (
                   <button
-                    onClick={() => handleCancel(d._id)}
-                    className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-all w-fit flex-shrink-0"
+                    onClick={() => handleGeneratePickupOtp(d)}
+                    disabled={otpLoading === d._id}
+                    className="w-fit flex items-center gap-2 px-5 py-2.5 rounded-full bg-secondary/15 text-secondary text-sm font-medium hover:bg-secondary/25 transition-all disabled:opacity-60"
                   >
-                    Cancel
+                    <KeyRound size={14} />
+                    {otpLoading === d._id ? 'Generating...' : 'Generate Pickup OTP'}
                   </button>
+                )}
+
+                {d.status === 'accepted' && !d.assignedVolunteer && (
+                  <p className="text-xs text-textmuted">Waiting for a volunteer to be assigned before pickup can begin.</p>
                 )}
               </motion.div>
             ))
           )}
         </div>
       </div>
+
+      {otpModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setOtpModal(null)}
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-6"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm rounded-2xl bg-surface border border-white/10 p-6 text-center"
+          >
+            <div className="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center mx-auto mb-4">
+              <KeyRound size={24} className="text-secondary" />
+            </div>
+            <h3 className="font-display text-xl text-textmain mb-1">Pickup OTP</h3>
+            <p className="text-sm text-textmuted mb-5">
+              Share this code with the volunteer picking up <span className="text-textmain">{otpModal.foodName}</span> to confirm handover.
+            </p>
+            <div className="text-4xl font-mono font-semibold text-secondary tracking-[0.3em] mb-6">
+              {generatedOtp}
+            </div>
+            <button
+              onClick={() => setOtpModal(null)}
+              className="w-full py-3 rounded-xl bg-primary text-bg text-sm font-medium hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-all"
+            >
+              Done
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
 
       {showProfile && (
         <motion.div

@@ -1,12 +1,13 @@
 const User = require('../models/User');
+const { sendApprovalEmail, sendRejectionEmail } = require('../utils/sendEmail');
 
 // ============ GET ALL PENDING USERS ============
 exports.getPendingUsers = async (req, res) => {
   try {
-    const pendingUsers = await User.find({ 
-      status: 'pending', 
+    const pendingUsers = await User.find({
+      status: 'pending',
       isEmailVerified: true,
-      role: { $ne: 'admin' } 
+      role: { $ne: 'admin' }
     }).select('-password');
 
     res.status(200).json({ count: pendingUsers.length, users: pendingUsers });
@@ -20,7 +21,7 @@ exports.getPendingUsers = async (req, res) => {
 // ============ GET ALL USERS (any status, with optional filters) ============
 exports.getAllUsers = async (req, res) => {
   try {
-    const { role, status } = req.query; // optional filters: ?role=restaurant&status=approved
+    const { role, status } = req.query;
 
     const filter = { role: { $ne: 'admin' } };
     if (role) filter.role = role;
@@ -40,7 +41,7 @@ exports.getAllUsers = async (req, res) => {
 exports.updateUserStatus = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { status } = req.body; // 'approved', 'rejected', or 'pending' (revoke)
+    const { status } = req.body;
 
     if (!['approved', 'rejected', 'pending'].includes(status)) {
       return res.status(400).json({ message: 'Status must be approved, rejected, or pending' });
@@ -55,13 +56,22 @@ exports.updateUserStatus = async (req, res) => {
       return res.status(400).json({ message: 'User has not verified their email yet' });
     }
 
+    const previousStatus = user.status;
+
     user.status = status;
     user.isVerified = status === 'approved';
     await user.save();
 
-    res.status(200).json({ 
-      message: `User ${status} successfully`, 
-      user: { id: user._id, name: user.name, email: user.email, status: user.status } 
+    // Send email only when status actually changes to approved/rejected
+    if (status === 'approved' && previousStatus !== 'approved') {
+      sendApprovalEmail(user.email, user.name).catch((err) => console.error('Approval email failed:', err));
+    } else if (status === 'rejected' && previousStatus !== 'rejected') {
+      sendRejectionEmail(user.email, user.name).catch((err) => console.error('Rejection email failed:', err));
+    }
+
+    res.status(200).json({
+      message: `User ${status} successfully`,
+      user: { id: user._id, name: user.name, email: user.email, status: user.status }
     });
 
   } catch (error) {
