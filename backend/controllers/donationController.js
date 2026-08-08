@@ -16,15 +16,12 @@ exports.createDonation = async (req, res) => {
       contactNumber
     } = req.body;
 
-    // Basic required field check
     if (!foodName || !foodType || !quantity || !cookingTime || !expiryTime || !pickupAddress || !latitude || !longitude || !contactNumber) {
       return res.status(400).json({ message: 'Please fill all required fields' });
     }
 
-    // SYSTEM CHECK (jaisa flowchart mein hai)
     const now = new Date();
     const expiry = new Date(expiryTime);
-
     const isExpiryValid = expiry > now;
 
     if (!isExpiryValid) {
@@ -123,19 +120,18 @@ exports.cancelDonation = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 // ============ GET AVAILABLE DONATIONS FOR NGO (Nearby, Pending) ============
 exports.getAvailableDonations = async (req, res) => {
   try {
-    const { latitude, longitude, maxDistance } = req.query; 
-    // maxDistance in KM, optional — default 20km
+    const { latitude, longitude, maxDistance } = req.query;
 
     const donations = await FoodDonation.find({ status: 'pending' })
       .populate('donor', 'name phone businessInfo')
       .sort({ createdAt: -1 });
 
-    // Agar NGO ne apni location bheji hai, toh distance calculate karke sort/filter karenge
     if (latitude && longitude) {
-      const dist = maxDistance ? parseFloat(maxDistance) : 20; // default 20km
+      const dist = maxDistance ? parseFloat(maxDistance) : 20;
 
       const donationsWithDistance = donations.map((donation) => {
         const distanceKm = calculateDistance(
@@ -154,7 +150,6 @@ exports.getAvailableDonations = async (req, res) => {
       return res.status(200).json({ count: nearbyDonations.length, donations: nearbyDonations });
     }
 
-    // Agar location nahi bheji, sab pending donations bhej do
     res.status(200).json({ count: donations.length, donations });
 
   } catch (error) {
@@ -180,9 +175,9 @@ exports.acceptDonation = async (req, res) => {
     donation.acceptedBy = req.user._id;
     await donation.save();
 
-    res.status(200).json({ 
-      message: 'Donation accepted successfully! Restaurant will be notified.', 
-      donation 
+    res.status(200).json({
+      message: 'Donation accepted successfully! Restaurant will be notified.',
+      donation
     });
 
   } catch (error) {
@@ -209,7 +204,7 @@ exports.getMyAcceptedDonations = async (req, res) => {
 
 // ============ HELPER: Calculate distance between 2 coordinates (Haversine formula) ============
 function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Earth radius in KM
+  const R = 6371;
   const dLat = deg2rad(lat2 - lat1);
   const dLon = deg2rad(lon2 - lon1);
   const a =
@@ -223,12 +218,13 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 function deg2rad(deg) {
   return deg * (Math.PI / 180);
 }
+
 // ============ GET AVAILABLE PICKUPS FOR VOLUNTEER (accepted, no volunteer assigned) ============
 exports.getAvailablePickups = async (req, res) => {
   try {
-    const donations = await FoodDonation.find({ 
-      status: 'accepted', 
-      assignedVolunteer: null 
+    const donations = await FoodDonation.find({
+      status: 'accepted',
+      assignedVolunteer: null
     })
       .populate('donor', 'name phone pickupAddress')
       .populate('acceptedBy', 'name phone')
@@ -262,9 +258,9 @@ exports.assignVolunteer = async (req, res) => {
     donation.assignedVolunteer = req.user._id;
     await donation.save();
 
-    res.status(200).json({ 
-      message: 'Pickup task assigned to you successfully!', 
-      donation 
+    res.status(200).json({
+      message: 'Pickup task assigned to you successfully!',
+      donation
     });
 
   } catch (error) {
@@ -273,7 +269,7 @@ exports.assignVolunteer = async (req, res) => {
   }
 };
 
-// ============ MARK AS PICKED UP (Volunteer at Restaurant) ============
+// ============ MARK AS PICKED UP (kept for backward compatibility, not used in new flow) ============
 exports.markPickedUp = async (req, res) => {
   try {
     const donation = await FoodDonation.findById(req.params.id);
@@ -301,7 +297,7 @@ exports.markPickedUp = async (req, res) => {
   }
 };
 
-// ============ GENERATE DELIVERY OTP (when volunteer reaches NGO) ============
+// ============ GENERATE DELIVERY OTP (NGO generates when volunteer arrives) ============
 exports.generateDeliveryOTP = async (req, res) => {
   try {
     const donation = await FoodDonation.findById(req.params.id);
@@ -310,24 +306,21 @@ exports.generateDeliveryOTP = async (req, res) => {
       return res.status(404).json({ message: 'Donation not found' });
     }
 
-    if (donation.assignedVolunteer.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'You are not assigned to this donation' });
+    if (donation.acceptedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Only the accepting NGO can generate this OTP' });
     }
 
     if (donation.status !== 'picked_up') {
-      return res.status(400).json({ message: 'Food must be picked up first' });
+      return res.status(400).json({ message: 'Volunteer must have picked up the food first' });
     }
 
-    // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     donation.deliveryOTP = otp;
     await donation.save();
 
-    // NOTE: Ideally yeh OTP NGO ko email/SMS se jaana chahiye
-    // Abhi ke liye response mein bhej rahe hain testing ke liye
-    res.status(200).json({ 
-      message: 'Delivery OTP generated. Share this with the NGO to confirm delivery.', 
-      otp 
+    res.status(200).json({
+      message: 'Delivery OTP generated. Share this with the volunteer to confirm delivery.',
+      otp
     });
 
   } catch (error) {
@@ -336,7 +329,7 @@ exports.generateDeliveryOTP = async (req, res) => {
   }
 };
 
-// ============ CONFIRM DELIVERY (NGO enters OTP) ============
+// ============ CONFIRM DELIVERY (Volunteer enters OTP given by NGO) ============
 exports.confirmDelivery = async (req, res) => {
   try {
     const { otp } = req.body;
@@ -346,8 +339,8 @@ exports.confirmDelivery = async (req, res) => {
       return res.status(404).json({ message: 'Donation not found' });
     }
 
-    if (donation.acceptedBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Only the accepting NGO can confirm delivery' });
+    if (donation.assignedVolunteer.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Only the assigned volunteer can confirm delivery' });
     }
 
     if (donation.status !== 'picked_up') {
@@ -387,6 +380,7 @@ exports.getMyVolunteerTasks = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 // ============ GENERATE PICKUP OTP (Restaurant generates when volunteer arrives) ============
 exports.generatePickupOTP = async (req, res) => {
   try {

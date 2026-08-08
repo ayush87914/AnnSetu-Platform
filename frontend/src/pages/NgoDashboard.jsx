@@ -26,9 +26,8 @@ export default function NgoDashboard() {
   const [message, setMessage] = useState('');
   const [showProfile, setShowProfile] = useState(false);
   const [location, setLocation] = useState(null);
-  const [confirmModal, setConfirmModal] = useState(null);
-  const [otpInput, setOtpInput] = useState('');
-  const [confirmError, setConfirmError] = useState('');
+  const [otpModal, setOtpModal] = useState(null);
+  const [generatedOtp, setGeneratedOtp] = useState('');
 
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -101,22 +100,15 @@ export default function NgoDashboard() {
     }
   };
 
-  const handleConfirmDelivery = async (e) => {
-    e.preventDefault();
-    setConfirmError('');
-    setActionLoading(confirmModal._id);
+  const handleGenerateDeliveryOtp = async (donation) => {
+    setActionLoading(donation._id);
+    setMessage('');
     try {
-      await axios.patch(
-        'http://localhost:5000/api/donations/confirm-delivery/' + confirmModal._id,
-        { otp: otpInput },
-        authHeader
-      );
-      setMessage('Delivery confirmed successfully! 🎉');
-      setConfirmModal(null);
-      setOtpInput('');
-      fetchAll(location?.lat, location?.lng);
+      const res = await axios.post('http://localhost:5000/api/donations/ngo/generate-delivery-otp/' + donation._id, {}, authHeader);
+      setGeneratedOtp(res.data.otp);
+      setOtpModal(donation);
     } catch (err) {
-      setConfirmError(err.response?.data?.message || 'Invalid OTP');
+      setMessage(err.response?.data?.message || 'Failed to generate OTP');
     } finally {
       setActionLoading(null);
     }
@@ -247,11 +239,12 @@ export default function NgoDashboard() {
 
                 {activeTab === 'accepted' && d.status === 'picked_up' && (
                   <button
-                    onClick={() => { setConfirmModal(d); setOtpInput(''); setConfirmError(''); }}
-                    className="w-fit flex items-center gap-2 px-5 py-2.5 rounded-full bg-secondary/15 text-secondary text-sm font-medium hover:bg-secondary/25 transition-all"
+                    onClick={() => handleGenerateDeliveryOtp(d)}
+                    disabled={actionLoading === d._id}
+                    className="w-fit flex items-center gap-2 px-5 py-2.5 rounded-full bg-secondary/15 text-secondary text-sm font-medium hover:bg-secondary/25 transition-all disabled:opacity-60"
                   >
                     <KeyRound size={14} />
-                    Confirm Delivery (Enter OTP)
+                    {actionLoading === d._id ? 'Generating...' : 'Generate Delivery OTP'}
                   </button>
                 )}
               </motion.div>
@@ -260,60 +253,35 @@ export default function NgoDashboard() {
         </div>
       </div>
 
-      {confirmModal && (
+      {otpModal && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          onClick={() => setConfirmModal(null)}
+          onClick={() => setOtpModal(null)}
           className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-6"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-sm rounded-2xl bg-surface border border-white/10 p-6"
+            className="w-full max-w-sm rounded-2xl bg-surface border border-white/10 p-6 text-center"
           >
-            <div className="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center mx-auto mb-4">
               <KeyRound size={24} className="text-secondary" />
             </div>
-            <h3 className="font-display text-xl text-textmain mb-1">Confirm Delivery</h3>
+            <h3 className="font-display text-xl text-textmain mb-1">Delivery OTP</h3>
             <p className="text-sm text-textmuted mb-5">
-              Enter the OTP shared by the volunteer to confirm <span className="text-textmain">{confirmModal.foodName}</span> has been delivered.
+              Share this code with the volunteer delivering <span className="text-textmain">{otpModal.foodName}</span> to confirm handover.
             </p>
-
-            {confirmError && (
-              <div className="mb-4 px-4 py-2.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
-                {confirmError}
-              </div>
-            )}
-
-            <form onSubmit={handleConfirmDelivery} className="flex flex-col gap-4">
-              <input
-                type="text"
-                placeholder="6-digit OTP"
-                required
-                maxLength={6}
-                value={otpInput}
-                onChange={(e) => setOtpInput(e.target.value)}
-                className="w-full text-center text-2xl tracking-[0.3em] font-mono py-3 rounded-xl bg-white/5 border border-white/10 text-textmain focus:outline-none focus:border-primary/50"
-              />
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setConfirmModal(null)}
-                  className="flex-1 py-3 rounded-xl border border-white/15 text-textmuted text-sm hover:text-textmain transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={actionLoading === confirmModal._id}
-                  className="flex-1 py-3 rounded-xl bg-primary text-bg text-sm font-medium hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-all disabled:opacity-60"
-                >
-                  {actionLoading === confirmModal._id ? 'Confirming...' : 'Confirm'}
-                </button>
-              </div>
-            </form>
+            <div className="text-4xl font-mono font-semibold text-secondary tracking-[0.3em] mb-6">
+              {generatedOtp}
+            </div>
+            <button
+              onClick={() => setOtpModal(null)}
+              className="w-full py-3 rounded-xl bg-primary text-bg text-sm font-medium hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-all"
+            >
+              Done
+            </button>
           </motion.div>
         </motion.div>
       )}

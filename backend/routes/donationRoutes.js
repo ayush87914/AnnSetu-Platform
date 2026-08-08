@@ -32,13 +32,13 @@ router.post('/generate-pickup-otp/:id', checkRole('restaurant'), generatePickupO
 router.get('/available/nearby', checkRole('ngo'), getAvailableDonations);
 router.patch('/accept/:id', checkRole('ngo'), acceptDonation);
 router.get('/ngo/my-accepted', checkRole('ngo'), getMyAcceptedDonations);
-router.patch('/confirm-delivery/:id', checkRole('ngo'), confirmDelivery);
+router.patch('/confirm-delivery/:id', checkRole('volunteer'), confirmDelivery);
 
 // Volunteer routes
 router.get('/volunteer/available-pickups', checkRole('volunteer'), getAvailablePickups);
 router.patch('/volunteer/assign/:id', checkRole('volunteer'), assignVolunteer);
 router.patch('/volunteer/picked-up/:id', checkRole('volunteer'), markPickedUp);
-router.post('/volunteer/generate-otp/:id', checkRole('volunteer'), generateDeliveryOTP);
+router.post('/ngo/generate-delivery-otp/:id', checkRole('ngo'), generateDeliveryOTP);
 router.get('/volunteer/my-tasks', checkRole('volunteer'), getMyVolunteerTasks);
 router.patch('/volunteer/verify-pickup-otp/:id', checkRole('volunteer'), verifyPickupOTP);
 
