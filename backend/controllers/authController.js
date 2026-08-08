@@ -230,3 +230,51 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+// ================= UPDATE PROFILE (name, phone, profile image) =================
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, phone, profileImage } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (name) user.name = name;
+    if (phone) user.phone = phone;
+    if (profileImage) user.profileImage = profileImage;
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        status: user.status,
+        profileImage: user.profileImage
+      }
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// ================= GET MY PROFILE (fresh data) =================
+exports.getMyProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, Package, Clock, MapPin, Phone, LogOut, CheckCircle2, Store, HeartHandshake, X, User, Mail, ShieldCheck, KeyRound } from 'lucide-react';
+import { Leaf, Package, Clock, MapPin, Phone, LogOut, CheckCircle2, Store, HeartHandshake, KeyRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ProfileModal from '../components/ProfileModal';
 
 const statusLabels = {
   accepted: 'Ready for Pickup',
@@ -25,9 +26,9 @@ export default function VolunteerDashboard() {
   const [deliveryModal, setDeliveryModal] = useState(null);
   const [deliveryOtpInput, setDeliveryOtpInput] = useState('');
   const [deliveryError, setDeliveryError] = useState('');
+  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
 
   const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const authHeader = { headers: { Authorization: 'Bearer ' + token } };
 
   const fetchData = async () => {
@@ -49,7 +50,7 @@ export default function VolunteerDashboard() {
   };
 
   useEffect(() => {
-    if (!token || user.role !== 'volunteer') {
+    if (!token || currentUser.role !== 'volunteer') {
       navigate('/login');
       return;
     }
@@ -127,24 +128,41 @@ export default function VolunteerDashboard() {
 
       <div className="relative z-10 max-w-5xl mx-auto">
         <div className="flex items-center justify-between mb-10">
-          <button onClick={() => setShowProfile(true)} className="flex items-center gap-2 text-left">
-            <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
               <Leaf size={18} className="text-primary" />
             </div>
-            <div>
-              <div className="font-display text-lg font-semibold text-textmain leading-tight">
-                Anna<span className="text-primary">Setu</span>
-              </div>
-              <div className="text-xs text-textmuted">Welcome back, {user.name} • View profile</div>
-            </div>
-          </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/15 text-sm text-textmuted hover:text-textmain hover:border-white/30 transition-all"
-          >
-            <LogOut size={14} />
-            Logout
-          </button>
+            <span className="font-display text-lg font-semibold text-textmain">
+              Anna<span className="text-primary">Setu</span>
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowProfile(true)}
+              className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-white/10 hover:border-primary/40 transition-all"
+              title="View profile"
+            >
+              {currentUser.profileImage ? (
+                <img src={currentUser.profileImage} alt={currentUser.name} className="w-7 h-7 rounded-full object-cover" />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
+                  <span className="text-[11px] font-medium text-primary">
+                    {currentUser.name?.charAt(0).toUpperCase() || 'U'}
+                  </span>
+                </div>
+              )}
+              <span className="text-sm text-textmain hidden sm:inline">{currentUser.name}</span>
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="w-9 h-9 rounded-full border border-white/15 text-textmuted hover:text-red-400 hover:border-red-400/40 transition-all flex items-center justify-center flex-shrink-0"
+              title="Logout"
+            >
+              <LogOut size={15} />
+            </button>
+          </div>
         </div>
 
         <h1 className="font-display text-3xl font-medium text-textmain mb-8">Delivery Tasks</h1>
@@ -372,39 +390,11 @@ export default function VolunteerDashboard() {
       )}
 
       {showProfile && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          onClick={() => setShowProfile(false)}
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-6"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md rounded-2xl bg-surface border border-white/10 p-6"
-          >
-            <div className="flex items-start justify-between mb-5">
-              <h3 className="font-display text-xl text-textmain">My Profile</h3>
-              <button onClick={() => setShowProfile(false)} className="text-textmuted hover:text-textmain">
-                <X size={18} />
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-3 text-sm">
-              <div className="flex items-center gap-2 text-textmuted">
-                <User size={14} /> {user.name}
-              </div>
-              <div className="flex items-center gap-2 text-textmuted">
-                <Mail size={14} /> {user.email}
-              </div>
-              <div className="flex items-center gap-2 text-textmuted">
-                <ShieldCheck size={14} className="text-primary" />
-                Status: <span className="text-primary capitalize">{user.status || 'approved'}</span>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
+        <ProfileModal
+          user={currentUser}
+          onClose={() => setShowProfile(false)}
+          onUpdate={(updated) => setCurrentUser(updated)}
+        />
       )}
     </div>
   );

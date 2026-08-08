@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Leaf, Users, Store, HeartHandshake, Bike, Clock, Check, X, LogOut, ShieldCheck, Mail, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ProfileModal from '../components/ProfileModal';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -14,9 +15,10 @@ export default function AdminDashboard() {
   const [message, setMessage] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
   const [activeTab, setActiveTab] = useState('pending');
+  const [showProfile, setShowProfile] = useState(false);
+  const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
 
   const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const authHeader = { headers: { Authorization: 'Bearer ' + token } };
 
   const fetchData = async () => {
@@ -41,7 +43,7 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    if (!token || user.role !== 'admin') {
+    if (!token || currentUser.role !== 'admin') {
       navigate('/login');
       return;
     }
@@ -89,20 +91,40 @@ export default function AdminDashboard() {
       <div className="relative z-10 max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0">
               <Leaf size={18} className="text-primary" />
             </div>
-            <span className="font-display text-xl font-semibold text-textmain">
+            <span className="font-display text-lg font-semibold text-textmain">
               Anna<span className="text-primary">Setu</span> Admin
             </span>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/15 text-sm text-textmuted hover:text-textmain hover:border-white/30 transition-all"
-          >
-            <LogOut size={14} />
-            Logout
-          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowProfile(true)}
+              className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-white/10 hover:border-primary/40 transition-all"
+              title="View profile"
+            >
+              {currentUser.profileImage ? (
+                <img src={currentUser.profileImage} alt={currentUser.name} className="w-7 h-7 rounded-full object-cover" />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center">
+                  <span className="text-[11px] font-medium text-primary">
+                    {currentUser.name?.charAt(0).toUpperCase() || 'U'}
+                  </span>
+                </div>
+              )}
+              <span className="text-sm text-textmain hidden sm:inline">{currentUser.name}</span>
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="w-9 h-9 rounded-full border border-white/15 text-textmuted hover:text-red-400 hover:border-red-400/40 transition-all flex items-center justify-center flex-shrink-0"
+              title="Logout"
+            >
+              <LogOut size={15} />
+            </button>
+          </div>
         </div>
 
         <h1 className="font-display text-3xl font-medium text-textmain mb-8">Dashboard Overview</h1>
@@ -155,14 +177,23 @@ export default function AdminDashboard() {
                   onClick={() => setSelectedUser(u)}
                   className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-4 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:border-primary/30 transition-all"
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-textmain font-medium">{u.name}</span>
-                      <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                        {u.role}
-                      </span>
+                  <div className="flex items-center gap-3">
+                    {u.profileImage ? (
+                      <img src={u.profileImage} alt={u.name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-xs font-medium text-primary">{u.name?.charAt(0).toUpperCase()}</span>
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-textmain font-medium">{u.name}</span>
+                        <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                          {u.role}
+                        </span>
+                      </div>
+                      <div className="text-xs text-textmuted mt-1">{u.email} • {u.phone}</div>
                     </div>
-                    <div className="text-xs text-textmuted mt-1">{u.email} • {u.phone}</div>
                   </div>
 
                   {activeTab === 'pending' ? (
@@ -214,11 +245,20 @@ export default function AdminDashboard() {
               className="w-full max-w-md rounded-2xl bg-surface border border-white/10 p-6"
             >
               <div className="flex items-start justify-between mb-5">
-                <div>
-                  <h3 className="font-display text-xl text-textmain">{selectedUser.name}</h3>
-                  <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/10 text-primary mt-1 inline-block">
-                    {selectedUser.role}
-                  </span>
+                <div className="flex items-center gap-3">
+                  {selectedUser.profileImage ? (
+                    <img src={selectedUser.profileImage} alt={selectedUser.name} className="w-12 h-12 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <span className="text-sm font-medium text-primary">{selectedUser.name?.charAt(0).toUpperCase()}</span>
+                    </div>
+                  )}
+                  <div>
+                    <h3 className="font-display text-xl text-textmain">{selectedUser.name}</h3>
+                    <span className="text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-primary/10 text-primary mt-1 inline-block">
+                      {selectedUser.role}
+                    </span>
+                  </div>
                 </div>
                 <button onClick={() => setSelectedUser(null)} className="text-textmuted hover:text-textmain">
                   <X size={18} />
@@ -274,6 +314,14 @@ export default function AdminDashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showProfile && (
+        <ProfileModal
+          user={currentUser}
+          onClose={() => setShowProfile(false)}
+          onUpdate={(updated) => setCurrentUser(updated)}
+        />
+      )}
     </div>
   );
 }

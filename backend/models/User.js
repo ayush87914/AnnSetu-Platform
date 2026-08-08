@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   businessInfo: { type: String },
   ngoInfo: { type: String },
   idProof: { type: String },
+  profileImage: { type: String },
 
   isVerified: { type: Boolean, default: false },
   isEmailVerified: { type: Boolean, default: false },
