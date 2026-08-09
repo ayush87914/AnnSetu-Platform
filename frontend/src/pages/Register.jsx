@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Store, HeartHandshake, Bike, ShieldCheck, User, Mail, Phone, Lock, Leaf } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_URL } from '../config';
 
 const roles = [
   { key: 'restaurant', label: 'Restaurant', icon: Store },
@@ -59,7 +60,7 @@ export default function Register() {
         payload.idProof = formData.idProof;
       }
 
-      await axios.post('http://localhost:5000/api/auth/register', payload);
+      await axios.post(`${API_URL}/api/auth/register`, payload);
       navigate('/verify-otp', { state: { email: formData.email } });
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong');
