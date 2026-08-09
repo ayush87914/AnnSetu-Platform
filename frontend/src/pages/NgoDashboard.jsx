@@ -4,6 +4,8 @@ import { Leaf, Package, Clock, MapPin, Phone, LogOut, CheckCircle2, Navigation, 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProfileModal from '../components/ProfileModal';
+import DonationsMap from '../components/DonationsMap';
+import { List, Map as MapIcon } from 'lucide-react';
 
 const statusColors = {
   accepted: 'bg-accentglow/15 text-accentglow',
@@ -30,6 +32,7 @@ export default function NgoDashboard() {
   const [otpModal, setOtpModal] = useState(null);
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
+  const [viewMode, setViewMode] = useState('list');
 
   const token = localStorage.getItem('token');
   const authHeader = { headers: { Authorization: 'Bearer ' + token } };
@@ -178,20 +181,43 @@ export default function NgoDashboard() {
           </div>
         )}
 
-        <div className="flex gap-2 bg-white/5 p-1 rounded-full w-fit mb-6">
-          <button
-            onClick={() => setActiveTab('nearby')}
-            className={'px-4 py-1.5 rounded-full text-sm transition-all ' + (activeTab === 'nearby' ? 'bg-primary text-bg' : 'text-textmuted')}
-          >
-            Nearby ({nearbyDonations.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('accepted')}
-            className={'px-4 py-1.5 rounded-full text-sm transition-all ' + (activeTab === 'accepted' ? 'bg-primary text-bg' : 'text-textmuted')}
-          >
-            My Accepted ({acceptedDonations.length})
-          </button>
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
+          <div className="flex gap-2 bg-white/5 p-1 rounded-full w-fit">
+            <button
+              onClick={() => setActiveTab('nearby')}
+              className={'px-4 py-1.5 rounded-full text-sm transition-all ' + (activeTab === 'nearby' ? 'bg-primary text-bg' : 'text-textmuted')}
+            >
+              Nearby ({nearbyDonations.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('accepted')}
+              className={'px-4 py-1.5 rounded-full text-sm transition-all ' + (activeTab === 'accepted' ? 'bg-primary text-bg' : 'text-textmuted')}
+            >
+              My Accepted ({acceptedDonations.length})
+            </button>
+          </div>
+
+          {activeTab === 'nearby' && (
+            <div className="flex gap-2 bg-white/5 p-1 rounded-full w-fit">
+              <button
+                onClick={() => setViewMode('list')}
+                className={'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all ' + (viewMode === 'list' ? 'bg-primary text-bg' : 'text-textmuted')}
+              >
+                <List size={12} /> List
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all ' + (viewMode === 'map' ? 'bg-primary text-bg' : 'text-textmuted')}
+              >
+                <MapIcon size={12} /> Map
+              </button>
+            </div>
+          )}
         </div>
+
+        {activeTab === 'nearby' && viewMode === 'map' && nearbyDonations.length > 0 && (
+          <DonationsMap donations={nearbyDonations} userLocation={location} />
+        )}
 
         <div className="flex flex-col gap-4">
           {loading ? (

@@ -4,6 +4,7 @@ import { Leaf, Package, Clock, MapPin, Phone, LogOut, CheckCircle2, Store, Heart
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProfileModal from '../components/ProfileModal';
+import RouteMap from '../components/RouteMap';
 
 const statusLabels = {
   accepted: 'Ready for Pickup',
@@ -247,6 +248,14 @@ export default function VolunteerDashboard() {
                     </button>
                   )}
                 </div>
+
+                {activeTab === 'tasks' && d.pickupLocation && (
+                  <RouteMap
+                    pickupLat={d.pickupLocation.latitude}
+                    pickupLng={d.pickupLocation.longitude}
+                    restaurantName={d.donor?.name}
+                  />
+                )}
 
                 {activeTab === 'tasks' && d.status === 'accepted' && (
                   <button

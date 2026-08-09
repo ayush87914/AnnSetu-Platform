@@ -4,6 +4,7 @@ import { Leaf, Plus, Package, Clock, MapPin, Phone, LogOut, X, CheckCircle2, Ima
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProfileModal from '../components/ProfileModal';
+import LocationPicker from '../components/LocationPicker';
 
 const statusColors = {
   pending: 'bg-secondary/15 text-secondary',
@@ -303,24 +304,27 @@ export default function RestaurantDashboard() {
               className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-textmain placeholder:text-textmuted focus:outline-none focus:border-primary/50"
             />
 
-            <div className="grid md:grid-cols-3 gap-4 items-end">
-              <input
-                type="text" name="latitude" placeholder="Latitude" required
-                value={formData.latitude} onChange={handleChange}
-                className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-textmain placeholder:text-textmuted focus:outline-none focus:border-primary/50"
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs text-textmuted">Pickup location (click on map to set)</label>
+                <button
+                  type="button" onClick={useMyLocation}
+                  className="flex items-center gap-1.5 text-xs text-primary hover:underline"
+                >
+                  <MapPin size={12} />
+                  Use my current location
+                </button>
+              </div>
+              <LocationPicker
+                latitude={formData.latitude}
+                longitude={formData.longitude}
+                onChange={(lat, lng) => setFormData((prev) => ({ ...prev, latitude: lat, longitude: lng }))}
               />
-              <input
-                type="text" name="longitude" placeholder="Longitude" required
-                value={formData.longitude} onChange={handleChange}
-                className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-textmain placeholder:text-textmuted focus:outline-none focus:border-primary/50"
-              />
-              <button
-                type="button" onClick={useMyLocation}
-                className="px-4 py-3 rounded-xl border border-white/15 text-sm text-textmuted hover:text-primary hover:border-primary/50 transition-all flex items-center justify-center gap-2"
-              >
-                <MapPin size={14} />
-                Use my location
-              </button>
+              {formData.latitude && formData.longitude && (
+                <p className="text-xs text-textmuted mt-2 font-mono">
+                  📍 {formData.latitude}, {formData.longitude}
+                </p>
+              )}
             </div>
 
             <button
