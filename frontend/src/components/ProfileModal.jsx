@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { X, User, Mail, Phone, ShieldCheck, Camera, Save } from 'lucide-react';
 import axios from 'axios';
+import { API_URL } from '../config';
 
 export default function ProfileModal({ user, onClose, onUpdate }) {
   const [editMode, setEditMode] = useState(false);
@@ -41,7 +42,7 @@ export default function ProfileModal({ user, onClose, onUpdate }) {
 
     try {
       const res = await axios.patch(
-        'http://localhost:5000/api/auth/update-profile',
+        `${API_URL}/api/auth/update-profile`,
         { name, phone, profileImage },
         authHeader
       );

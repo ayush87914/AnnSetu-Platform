@@ -4,6 +4,7 @@ import { Leaf, Plus, Package, Clock, MapPin, Phone, LogOut, X, CheckCircle2, Ima
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProfileModal from '../components/ProfileModal';
+import { API_URL } from '../config';
 import LocationPicker from '../components/LocationPicker';
 
 const statusColors = {
@@ -56,7 +57,7 @@ export default function RestaurantDashboard() {
   const fetchDonations = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/api/donations/my-donations', authHeader);
+      const res = await axios.get(`${API_URL}/api/donations/my-donations`, authHeader);
       setDonations(res.data.donations);
     } catch (err) {
       if (err.response?.status === 401 || err.response?.status === 403) {
@@ -114,7 +115,7 @@ export default function RestaurantDashboard() {
     setSubmitting(true);
 
     try {
-      await axios.post('http://localhost:5000/api/donations/create', formData, authHeader);
+      await axios.post(`${API_URL}/api/donations/create`, formData, authHeader);
       setMessage('Food donation posted successfully!');
       setShowForm(false);
       setImagePreview('');
@@ -132,7 +133,7 @@ export default function RestaurantDashboard() {
 
   const handleCancel = async (id) => {
     try {
-      await axios.patch('http://localhost:5000/api/donations/cancel/' + id, {}, authHeader);
+      await axios.patch(`${API_URL}/api/donations/cancel/${id}`, {}, authHeader);
       fetchDonations();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to cancel');
@@ -143,7 +144,7 @@ export default function RestaurantDashboard() {
     setOtpLoading(donation._id);
     setMessage('');
     try {
-      const res = await axios.post('http://localhost:5000/api/donations/generate-pickup-otp/' + donation._id, {}, authHeader);
+      const res = await axios.post(`${API_URL}/api/donations/generate-pickup-otp/${donation._id}`, {}, authHeader);
       setGeneratedOtp(res.data.otp);
       setOtpModal(donation);
     } catch (err) {

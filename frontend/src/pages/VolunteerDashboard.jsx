@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProfileModal from '../components/ProfileModal';
 import RouteMap from '../components/RouteMap';
+import { API_URL } from '../config';
 
 const statusLabels = {
   accepted: 'Ready for Pickup',
@@ -36,8 +37,8 @@ export default function VolunteerDashboard() {
     setLoading(true);
     try {
       const [availRes, tasksRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/donations/volunteer/available-pickups', authHeader),
-        axios.get('http://localhost:5000/api/donations/volunteer/my-tasks', authHeader),
+        axios.get(`${API_URL}/api/donations/volunteer/available-pickups`, authHeader),
+        axios.get(`${API_URL}/api/donations/volunteer/my-tasks`, authHeader),
       ]);
       setAvailablePickups(availRes.data.donations);
       setMyTasks(tasksRes.data.donations);
@@ -62,7 +63,7 @@ export default function VolunteerDashboard() {
     setActionLoading(id);
     setMessage('');
     try {
-      await axios.patch('http://localhost:5000/api/donations/volunteer/assign/' + id, {}, authHeader);
+      await axios.patch(`${API_URL}/api/donations/volunteer/assign/${id}`, {}, authHeader);
       setMessage('Pickup task assigned to you!');
       fetchData();
       setActiveTab('tasks');
@@ -79,7 +80,7 @@ export default function VolunteerDashboard() {
     setActionLoading(pickupModal._id);
     try {
       await axios.patch(
-        'http://localhost:5000/api/donations/volunteer/verify-pickup-otp/' + pickupModal._id,
+        `${API_URL}/api/donations/volunteer/verify-pickup-otp/${pickupModal._id}`,
         { otp: pickupOtpInput },
         authHeader
       );
@@ -100,7 +101,7 @@ export default function VolunteerDashboard() {
     setActionLoading(deliveryModal._id);
     try {
       await axios.patch(
-        'http://localhost:5000/api/donations/confirm-delivery/' + deliveryModal._id,
+        `${API_URL}/api/donations/confirm-delivery/${deliveryModal._id}`,
         { otp: deliveryOtpInput },
         authHeader
       );

@@ -6,6 +6,7 @@ import axios from 'axios';
 import ProfileModal from '../components/ProfileModal';
 import DonationsMap from '../components/DonationsMap';
 import { List, Map as MapIcon } from 'lucide-react';
+import { API_URL } from '../config';
 
 const statusColors = {
   accepted: 'bg-accentglow/15 text-accentglow',
@@ -40,8 +41,8 @@ export default function NgoDashboard() {
   const fetchNearby = async (lat, lng) => {
     try {
       const url = lat && lng
-        ? `http://localhost:5000/api/donations/available/nearby?latitude=${lat}&longitude=${lng}`
-        : 'http://localhost:5000/api/donations/available/nearby';
+        ? `${API_URL}/api/donations/available/nearby?latitude=${lat}&longitude=${lng}`
+        : `${API_URL}/api/donations/available/nearby`;
       const res = await axios.get(url, authHeader);
       setNearbyDonations(res.data.donations);
     } catch (err) {
@@ -53,7 +54,7 @@ export default function NgoDashboard() {
 
   const fetchAccepted = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/donations/ngo/my-accepted', authHeader);
+      const res = await axios.get(`${API_URL}/api/donations/ngo/my-accepted`, authHeader);
       setAcceptedDonations(res.data.donations);
     } catch (err) {
       console.error(err);
@@ -93,7 +94,7 @@ export default function NgoDashboard() {
     setActionLoading(id);
     setMessage('');
     try {
-      await axios.patch('http://localhost:5000/api/donations/accept/' + id, {}, authHeader);
+      await axios.patch(`${API_URL}/api/donations/accept/${id}`, {}, authHeader);
       setMessage('Donation accepted successfully!');
       fetchAll(location?.lat, location?.lng);
       setActiveTab('accepted');
@@ -108,7 +109,7 @@ export default function NgoDashboard() {
     setActionLoading(donation._id);
     setMessage('');
     try {
-      const res = await axios.post('http://localhost:5000/api/donations/ngo/generate-delivery-otp/' + donation._id, {}, authHeader);
+      const res = await axios.post(`${API_URL}/api/donations/ngo/generate-delivery-otp/${donation._id}`, {}, authHeader);
       setGeneratedOtp(res.data.otp);
       setOtpModal(donation);
     } catch (err) {
