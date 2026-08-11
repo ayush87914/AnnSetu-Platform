@@ -9,6 +9,15 @@ const {
   sendLoginAlert
 } = require('../utils/sendEmail');
 
+// Helper: send email but never let it crash the request
+const safeSendEmail = async (fn, ...args) => {
+  try {
+    await fn(...args);
+  } catch (err) {
+    console.error('Email send failed:', err.message);
+  }
+};
+
 // ================= REGISTER =================
 exports.register = async (req, res) => {
   try {
@@ -39,7 +48,7 @@ exports.register = async (req, res) => {
 
     await newUser.save();
 
-    await sendOTPEmail(email, otp);
+    await safeSendEmail(sendOTPEmail, email, otp);
 
     res.status(201).json({
       message: 'Registration successful! OTP sent to your email.',
@@ -108,7 +117,7 @@ exports.resendOTP = async (req, res) => {
     user.otpExpiry = otpExpiry;
     await user.save();
 
-    await sendOTPEmail(email, otp);
+    await safeSendEmail(sendOTPEmail, email, otp);
 
     res.status(200).json({ message: 'New OTP sent to your email' });
 
@@ -149,8 +158,7 @@ exports.login = async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // Send login alert email (non-blocking - don't fail login if email fails)
-    sendLoginAlert(user.email, user.name).catch((err) => console.error('Login alert email failed:', err));
+    safeSendEmail(sendLoginAlert, user.email, user.name);
 
     res.status(200).json({
       message: 'Login successful',
@@ -187,7 +195,7 @@ exports.forgotPassword = async (req, res) => {
     user.otpExpiry = otpExpiry;
     await user.save();
 
-    await sendPasswordResetOTP(email, otp);
+    await safeSendEmail(sendPasswordResetOTP, email, otp);
 
     res.status(200).json({ message: 'OTP sent to your email for password reset' });
 
@@ -221,7 +229,7 @@ exports.resetPassword = async (req, res) => {
     user.otpExpiry = undefined;
     await user.save();
 
-    await sendPasswordResetConfirmation(email, user.name);
+    await safeSendEmail(sendPasswordResetConfirmation, email, user.name);
 
     res.status(200).json({ message: 'Password reset successfully! You can now log in.' });
 
@@ -230,6 +238,7 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 // ================= UPDATE PROFILE (name, phone, profile image) =================
 exports.updateProfile = async (req, res) => {
   try {
