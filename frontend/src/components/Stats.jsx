@@ -1,15 +1,38 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Store, Users, UtensilsCrossed, Leaf, Globe } from 'lucide-react';
-
-const stats = [
-  { icon: Store, value: '1,000+', label: 'Restaurants Onboard' },
-  { icon: Users, value: '2,500+', label: 'NGOs Registered' },
-  { icon: UtensilsCrossed, value: '150K+', label: 'Meals Donated' },
-  { icon: Leaf, value: '4.5 Tons', label: 'Food Waste Saved' },
-  { icon: Globe, value: '100K+', label: 'People Impacted' },
-];
+import axios from 'axios';
+import { API_URL } from '../config';
 
 export default function Stats() {
+  const [stats, setStats] = useState({
+    totalRestaurants: 0,
+    totalNGOs: 0,
+    totalVolunteers: 0,
+    totalDonationsPosted: 0,
+    totalMealsDelivered: 0,
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/public/impact-stats`);
+        setStats(res.data);
+      } catch (err) {
+        console.error('Failed to load impact stats:', err);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const statList = [
+    { icon: Store, value: stats.totalRestaurants + '+', label: 'Restaurants Onboard' },
+    { icon: Users, value: stats.totalNGOs + '+', label: 'NGOs Registered' },
+    { icon: UtensilsCrossed, value: stats.totalMealsDelivered + '+', label: 'Meals Delivered' },
+    { icon: Leaf, value: stats.totalDonationsPosted + '+', label: 'Donations Posted' },
+    { icon: Globe, value: stats.totalVolunteers + '+', label: 'Active Volunteers' },
+  ];
+
   return (
     <section className="relative px-6 -mt-8 z-20">
       <motion.div
@@ -19,7 +42,7 @@ export default function Stats() {
         transition={{ duration: 0.6 }}
         className="max-w-6xl mx-auto rounded-3xl bg-white/[0.03] backdrop-blur-md border border-white/10 px-6 py-10 grid grid-cols-2 md:grid-cols-5 gap-8"
       >
-        {stats.map(({ icon: Icon, value, label }, i) => (
+        {statList.map(({ icon: Icon, value, label }, i) => (
           <motion.div
             key={label}
             initial={{ opacity: 0, y: 15 }}
