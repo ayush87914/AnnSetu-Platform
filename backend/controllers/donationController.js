@@ -454,3 +454,34 @@ exports.verifyPickupOTP = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+// ============ SUBMIT RATING (NGO rates Restaurant + Volunteer after delivery) ============
+exports.submitRating = async (req, res) => {
+  try {
+    const { restaurantRating, volunteerRating, feedbackComment } = req.body;
+    const donation = await FoodDonation.findById(req.params.id);
+
+    if (!donation) {
+      return res.status(404).json({ message: 'Donation not found' });
+    }
+
+    if (donation.acceptedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Only the receiving NGO can submit ratings' });
+    }
+
+    if (donation.status !== 'delivered') {
+      return res.status(400).json({ message: 'Can only rate after delivery is completed' });
+    }
+
+    if (restaurantRating) donation.restaurantRating = restaurantRating;
+    if (volunteerRating) donation.volunteerRating = volunteerRating;
+    if (feedbackComment) donation.feedbackComment = feedbackComment;
+
+    await donation.save();
+
+    res.status(200).json({ message: 'Thank you for your feedback!', donation });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

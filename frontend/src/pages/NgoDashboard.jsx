@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Leaf, Package, Clock, MapPin, Phone, LogOut, CheckCircle2, Navigation, Store, KeyRound } from 'lucide-react';
+import { Leaf, Package, Clock, MapPin, Phone, LogOut, CheckCircle2, Navigation, Store, KeyRound, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProfileModal from '../components/ProfileModal';
@@ -34,6 +34,10 @@ export default function NgoDashboard() {
   const [generatedOtp, setGeneratedOtp] = useState('');
   const [currentUser, setCurrentUser] = useState(JSON.parse(localStorage.getItem('user') || '{}'));
   const [viewMode, setViewMode] = useState('list');
+  const [ratingModal, setRatingModal] = useState(null);
+  const [restaurantRating, setRestaurantRating] = useState(0);
+  const [volunteerRating, setVolunteerRating] = useState(0);
+  const [feedbackComment, setFeedbackComment] = useState('');
 
   const token = localStorage.getItem('token');
   const authHeader = { headers: { Authorization: 'Bearer ' + token } };
@@ -114,6 +118,28 @@ export default function NgoDashboard() {
       setOtpModal(donation);
     } catch (err) {
       setMessage(err.response?.data?.message || 'Failed to generate OTP');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleSubmitRating = async (e) => {
+    e.preventDefault();
+    setActionLoading(ratingModal._id);
+    try {
+      await axios.patch(
+        `${API_URL}/api/donations/rate/${ratingModal._id}`,
+        { restaurantRating, volunteerRating, feedbackComment },
+        authHeader
+      );
+      setMessage('Thank you for your feedback!');
+      setRatingModal(null);
+      setRestaurantRating(0);
+      setVolunteerRating(0);
+      setFeedbackComment('');
+      fetchAccepted();
+    } catch (err) {
+      setMessage(err.response?.data?.message || 'Failed to submit rating');
     } finally {
       setActionLoading(null);
     }
@@ -292,6 +318,23 @@ export default function NgoDashboard() {
                     {actionLoading === d._id ? 'Generating...' : 'Generate Delivery OTP'}
                   </button>
                 )}
+
+                {activeTab === 'accepted' && d.status === 'delivered' && !d.restaurantRating && (
+                  <button
+                    onClick={() => { setRatingModal(d); setRestaurantRating(0); setVolunteerRating(0); setFeedbackComment(''); }}
+                    className="w-fit flex items-center gap-2 px-5 py-2.5 rounded-full bg-secondary/15 text-secondary text-sm font-medium hover:bg-secondary/25 transition-all"
+                  >
+                    <Star size={14} />
+                    Rate this delivery
+                  </button>
+                )}
+
+                {activeTab === 'accepted' && d.status === 'delivered' && d.restaurantRating && (
+                  <div className="flex items-center gap-1 text-xs text-textmuted">
+                    <CheckCircle2 size={14} className="text-primary" />
+                    Feedback submitted — thank you!
+                  </div>
+                )}
               </motion.div>
             ))
           )}
@@ -327,6 +370,97 @@ export default function NgoDashboard() {
             >
               Done
             </button>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {ratingModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setRatingModal(null)}
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-6"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm rounded-2xl bg-surface border border-white/10 p-6"
+          >
+            <h3 className="font-display text-xl text-textmain mb-1">Rate this delivery</h3>
+            <p className="text-sm text-textmuted mb-5">{ratingModal.foodName}</p>
+
+            <form onSubmit={handleSubmitRating} className="flex flex-col gap-5">
+              <div>
+                <label className="text-xs text-textmuted mb-2 block flex items-center gap-1.5">
+                  <Store size={12} /> Restaurant ({ratingModal.donor?.name || 'Restaurant'})
+                </label>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRestaurantRating(star)}
+                      className="transition-transform hover:scale-110"
+                    >
+                      <Star
+                        size={26}
+                        className={star <= restaurantRating ? 'fill-secondary text-secondary' : 'text-white/20'}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-textmuted mb-2 block flex items-center gap-1.5">
+                  Volunteer ({ratingModal.assignedVolunteer?.name || 'Volunteer'})
+                </label>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setVolunteerRating(star)}
+                      className="transition-transform hover:scale-110"
+                    >
+                      <Star
+                        size={26}
+                        className={star <= volunteerRating ? 'fill-secondary text-secondary' : 'text-white/20'}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs text-textmuted mb-1 block">Comment (optional)</label>
+                <textarea
+                  value={feedbackComment}
+                  onChange={(e) => setFeedbackComment(e.target.value)}
+                  rows={3}
+                  placeholder="Share your experience..."
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-textmain placeholder:text-textmuted focus:outline-none focus:border-primary/50 resize-none"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setRatingModal(null)}
+                  className="flex-1 py-3 rounded-xl border border-white/15 text-textmuted text-sm hover:text-textmain transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={actionLoading === ratingModal._id || !restaurantRating || !volunteerRating}
+                  className="flex-1 py-3 rounded-xl bg-primary text-bg text-sm font-medium hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-all disabled:opacity-60"
+                >
+                  {actionLoading === ratingModal._id ? 'Submitting...' : 'Submit'}
+                </button>
+              </div>
+            </form>
           </motion.div>
         </motion.div>
       )}

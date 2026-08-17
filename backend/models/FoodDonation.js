@@ -62,6 +62,11 @@ const foodDonationSchema = new mongoose.Schema({
   isDelivered: { type: Boolean, default: false },
   deliveredAt: { type: Date },
 
+  // Ratings & Feedback (NGO rates Restaurant + Volunteer after delivery)
+  restaurantRating: { type: Number, min: 1, max: 5 },
+  volunteerRating: { type: Number, min: 1, max: 5 },
+  feedbackComment: { type: String },
+
   createdAt: { type: Date, default: Date.now }
 });
 

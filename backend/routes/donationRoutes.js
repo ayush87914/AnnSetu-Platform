@@ -17,7 +17,8 @@ const {
   confirmDelivery,
   getMyVolunteerTasks,
   generatePickupOTP,
-  verifyPickupOTP
+  verifyPickupOTP,
+  submitRating
 } = require('../controllers/donationController');
 
 router.use(protect);
@@ -33,6 +34,7 @@ router.get('/available/nearby', checkRole('ngo'), getAvailableDonations);
 router.patch('/accept/:id', checkRole('ngo'), acceptDonation);
 router.get('/ngo/my-accepted', checkRole('ngo'), getMyAcceptedDonations);
 router.patch('/confirm-delivery/:id', checkRole('volunteer'), confirmDelivery);
+router.patch('/rate/:id', checkRole('ngo'), submitRating);
 
 // Volunteer routes
 router.get('/volunteer/available-pickups', checkRole('volunteer'), getAvailablePickups);
