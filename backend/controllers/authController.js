@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const FoodDonation = require('../models/FoodDonation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const generateOTP = require('../middleware/generateOTP');
@@ -274,14 +275,33 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// ================= GET MY PROFILE (fresh data) =================
+// ================= GET MY PROFILE (fresh data + rating for restaurant/volunteer) =================
 exports.getMyProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.status(200).json({ user });
+
+    let avgRating = null;
+    let totalRatings = 0;
+
+    if (user.role === 'restaurant') {
+      const donations = await FoodDonation.find({ donor: user._id, restaurantRating: { $exists: true } });
+      if (donations.length > 0) {
+        avgRating = (donations.reduce((sum, d) => sum + d.restaurantRating, 0) / donations.length).toFixed(1);
+        totalRatings = donations.length;
+      }
+    } else if (user.role === 'volunteer') {
+      const donations = await FoodDonation.find({ assignedVolunteer: user._id, volunteerRating: { $exists: true } });
+      if (donations.length > 0) {
+        avgRating = (donations.reduce((sum, d) => sum + d.volunteerRating, 0) / donations.length).toFixed(1);
+        totalRatings = donations.length;
+      }
+    }
+
+    res.status(200).json({ user: { ...user.toObject(), avgRating, totalRatings } });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error', error: error.message });

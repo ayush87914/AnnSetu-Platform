@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { X, User, Mail, Phone, ShieldCheck, Camera, Save } from 'lucide-react';
+import { X, User, Mail, Phone, ShieldCheck, Camera, Save, Star } from 'lucide-react';
 import axios from 'axios';
 import { API_URL } from '../config';
 
@@ -13,9 +13,27 @@ export default function ProfileModal({ user, onClose, onUpdate }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [ratingInfo, setRatingInfo] = useState({ avgRating: null, totalRatings: 0 });
 
   const token = localStorage.getItem('token');
   const authHeader = { headers: { Authorization: 'Bearer ' + token } };
+
+  useEffect(() => {
+    const fetchRating = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/auth/my-profile`, authHeader);
+        setRatingInfo({
+          avgRating: res.data.user.avgRating,
+          totalRatings: res.data.user.totalRatings
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    if (user.role === 'restaurant' || user.role === 'volunteer') {
+      fetchRating();
+    }
+  }, []);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -126,6 +144,12 @@ export default function ProfileModal({ user, onClose, onUpdate }) {
                 <ShieldCheck size={14} className="text-primary" />
                 Status: <span className="text-primary capitalize">{user.status || 'approved'}</span>
               </div>
+              {ratingInfo.avgRating && (
+                <div className="flex items-center gap-2 text-textmuted">
+                  <Star size={14} className="text-secondary fill-secondary" />
+                  Rating: <span className="text-secondary">{ratingInfo.avgRating} / 5</span> ({ratingInfo.totalRatings} reviews)
+                </div>
+              )}
             </div>
 
             <button
