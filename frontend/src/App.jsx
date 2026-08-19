@@ -13,6 +13,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import RestaurantDashboard from './pages/RestaurantDashboard';
 import NgoDashboard from './pages/NgoDashboard';
 import VolunteerDashboard from './pages/VolunteerDashboard';
+import AvailableFood from './pages/AvailableFood';
 
 function LandingPage() {
   return (
@@ -40,6 +41,7 @@ function App() {
         <Route path="/restaurant/dashboard" element={<RestaurantDashboard />} />
         <Route path="/ngo/dashboard" element={<NgoDashboard />} />
         <Route path="/volunteer/dashboard" element={<VolunteerDashboard />} />
+        <Route path="/available-food" element={<AvailableFood />} />
       </Routes>
     </div>
   );
