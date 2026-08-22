@@ -52,7 +52,8 @@ export default function Hero() {
         className="relative z-10 flex flex-col sm:flex-row gap-4 mt-10"
       >
         <a href="/register" className="px-7 py-3.5 rounded-full bg-primary text-bg font-medium hover:shadow-[0_0_30px_rgba(52,211,153,0.5)] transition-all text-center">Donate Food</a>
-        <a href="/register" className="px-7 py-3.5 rounded-full border border-white/15 text-textmain hover:border-primary/50 hover:text-primary transition-all text-center">Become a Volunteer</a>
+<a href="/available-food" className="px-7 py-3.5 rounded-full border border-white/15 text-textmain hover:border-primary/50 hover:text-primary transition-all text-center">Find Food</a>
+<a href="/register" className="px-7 py-3.5 rounded-full border border-white/15 text-textmain hover:border-primary/50 hover:text-primary transition-all text-center">Become a Volunteer</a>
       </motion.div>
 
       <div className="relative z-10 w-full max-w-4xl mt-24 hidden md:block">
