@@ -52,8 +52,8 @@ export default function Hero() {
         className="relative z-10 flex flex-col sm:flex-row gap-4 mt-10"
       >
         <a href="/register" className="px-7 py-3.5 rounded-full bg-primary text-bg font-medium hover:shadow-[0_0_30px_rgba(52,211,153,0.5)] transition-all text-center">Donate Food</a>
-<a href="/available-food" className="px-7 py-3.5 rounded-full border border-white/15 text-textmain hover:border-primary/50 hover:text-primary transition-all text-center">Find Food</a>
-<a href="/register" className="px-7 py-3.5 rounded-full border border-white/15 text-textmain hover:border-primary/50 hover:text-primary transition-all text-center">Become a Volunteer</a>
+        <a href="/available-food" className="px-7 py-3.5 rounded-full border border-white/15 text-textmain hover:border-primary/50 hover:text-primary transition-all text-center">Find Food</a>
+        <a href="/register" className="px-7 py-3.5 rounded-full border border-white/15 text-textmain hover:border-primary/50 hover:text-primary transition-all text-center">Become a Volunteer</a>
       </motion.div>
 
       <div className="relative z-10 w-full max-w-4xl mt-24 hidden md:block">
@@ -71,7 +71,7 @@ export default function Hero() {
             fill="#FBBF24"
             animate={{ offsetDistance: ['0%', '100%'] }}
             style={{ offsetPath: "path('M 60 50 Q 260 -10 400 50 T 740 50')" }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
           />
         </svg>
 
@@ -80,11 +80,8 @@ export default function Hero() {
             <motion.div
               key={label}
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: [0, -10, 0] }}
-              transition={{
-                opacity: { duration: 0.6, delay: 0.6 + delay },
-                y: { duration: 3, repeat: Infinity, ease: 'easeInOut', delay: delay },
-              }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 + delay }}
               className="flex flex-col items-center gap-3"
             >
               <div className="w-16 h-16 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
