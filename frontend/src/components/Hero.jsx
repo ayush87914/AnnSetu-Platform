@@ -57,8 +57,8 @@ export default function Hero() {
       </motion.div>
 
       <div className="relative z-10 w-full max-w-4xl mt-24 hidden md:block">
-        <svg viewBox="0 0 800 32" className="absolute top-8 left-0 w-full h-8" preserveAspectRatio="none">
-          <path d="M 60 16 L 740 16" stroke="url(#pathGradient)" strokeWidth="1.5" strokeDasharray="4 6" fill="none" />
+        <svg viewBox="0 0 800 60" className="absolute top-8 left-0 w-full h-16" preserveAspectRatio="none">
+          <path d="M 40 30 Q 160 -10 280 30 T 520 30 T 760 30" stroke="url(#pathGradient)" strokeWidth="1.5" strokeDasharray="4 6" fill="none" />
           <defs>
             <linearGradient id="pathGradient" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0%" stopColor="#34D399" />
@@ -70,7 +70,7 @@ export default function Hero() {
             r="4"
             fill="#FBBF24"
             animate={{ offsetDistance: ['0%', '100%'] }}
-            style={{ offsetPath: "path('M 60 16 L 740 16')" }}
+            style={{ offsetPath: "path('M 40 30 Q 160 -10 280 30 T 520 30 T 760 30')" }}
             transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
           />
         </svg>
