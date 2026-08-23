@@ -261,9 +261,9 @@ export default function RestaurantDashboard() {
                 name="foodType" value={formData.foodType} onChange={handleChange}
                 className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm text-textmain focus:outline-none focus:border-primary/50"
               >
-                <option value="veg">Vegetarian</option>
-                <option value="non-veg">Non-Vegetarian</option>
-                <option value="both">Both</option>
+                <option value="veg" className="bg-[#0F1F1C] text-white">Vegetarian</option>
+                <option value="non-veg" className="bg-[#0F1F1C] text-white">Non-Vegetarian</option>
+                <option value="both" className="bg-[#0F1F1C] text-white">Both</option>
               </select>
             </div>
 

@@ -22,7 +22,7 @@ export default function Hero() {
         className="relative z-10 flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm mb-8"
       >
         <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-        <span className="text-xs text-textmuted tracking-wide">Live in Ghaziabad &amp; Delhi NCR</span>
+        <span className="text-xs text-textmuted tracking-wide">Live in Rishikesh &amp; Dehraun India</span>
       </motion.div>
 
       <motion.h1

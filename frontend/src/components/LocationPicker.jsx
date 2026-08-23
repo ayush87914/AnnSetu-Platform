@@ -18,7 +18,7 @@ function ClickHandler({ onSelect }) {
   return null;
 }
 
-// Yeh component map ko naye position pe fly/pan karega jab bhi position prop change ho
+
 function MapUpdater({ position }) {
   const map = useMap();
 

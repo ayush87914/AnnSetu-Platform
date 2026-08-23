@@ -3,11 +3,11 @@ import { motion } from 'framer-motion';
 import { Menu, X, Leaf } from 'lucide-react';
 
 const navLinks = [
-  { label: 'Home', href: '#home' },
-  { label: 'How It Works', href: '#how-it-works' },
+  { label: 'Home', href: '/#home' },
+  { label: 'How It Works', href: '/#how-it-works' },
   { label: 'Available Food', href: '/available-food' },
-  { label: 'Volunteer', href: '#volunteer' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Volunteer', href: '/#volunteer' },
+  { label: 'Contact', href: '/#contact' },
 ];
 
 export default function Navbar() {

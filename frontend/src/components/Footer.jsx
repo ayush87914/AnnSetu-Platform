@@ -60,9 +60,9 @@ export default function Footer() {
           <div>
             <h4 className="text-textmain font-medium mb-4 text-sm">Contact Us</h4>
             <ul className="space-y-3 text-sm text-textmuted">
-              <li>+91 98765 43210</li>
-              <li>support@annasetu.org</li>
-              <li>New Delhi, India</li>
+              <li>+91 99999 99999</li>
+              <li>imission806@gmail.com</li>
+              <li>Dehradun, India</li>
             </ul>
           </div>
         </div>
