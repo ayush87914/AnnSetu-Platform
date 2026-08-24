@@ -82,3 +82,55 @@ Every day, tons of good food goes to waste while people go hungry. AnnaSetu brid
 ---
 
 ## 📱 User Roles & Flow
+
+Restaurant → Posts surplus food (with photo & location)
+↓
+NGO → Views nearby donations, accepts one
+↓
+Volunteer → Claims pickup task
+↓
+Restaurant generates Pickup OTP → Volunteer verifies → Status: Picked Up
+↓
+NGO generates Delivery OTP → Volunteer verifies → Status: Delivered
+↓
+NGO rates the Restaurant & Volunteer
+
+
+Admin oversees the entire platform — approving new users, monitoring activity, and managing access.
+
+---
+
+## 🚀 Getting Started (Local Setup)
+
+### Backend
+```bash
+cd backend
+npm install
+# create a .env file with MONGO_URI, JWT_SECRET, BREVO_API_KEY, BREVO_SENDER_EMAIL
+npm run dev
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## 📸 Screenshots
+
+*(Add screenshots of your landing page, dashboards, and mobile view here)*
+
+---
+
+## 👨‍💻 Author
+
+Built by **Ayush** as a full-stack learning project — covering authentication, real-time-style workflows, geolocation, email integration, and full deployment.
+
+---
+
+## 📄 License
+
+This project is open for educational purposes.
