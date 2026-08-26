@@ -24,7 +24,7 @@ export default function Footer() {
                 <Leaf size={16} className="text-primary" />
               </div>
               <span className="font-display text-lg font-semibold text-textmain">
-                Anna<span className="text-primary">Setu</span>
+                Ann<span className="text-primary">Setu</span>
               </span>
             </div>
             <p className="text-sm text-textmuted leading-relaxed">
@@ -68,7 +68,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-textmuted">
-          <span>© 2026 AnnaSetu. All rights reserved.</span>
+          <span>© 2026 AnnSetu. All rights reserved.</span>
           <span>Made with 💚 for a better tomorrow.</span>
         </div>
       </div>

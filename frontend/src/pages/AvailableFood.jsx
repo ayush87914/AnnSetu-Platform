@@ -60,7 +60,7 @@ export default function AvailableFood() {
                 to="/register"
                 className="inline-block px-6 py-3 rounded-full bg-primary text-bg text-sm font-medium hover:shadow-[0_0_20px_rgba(52,211,153,0.4)] transition-all"
               >
-                Join AnnaSetu
+                Join AnnSetu
               </Link>
             </div>
           ) : (
@@ -117,7 +117,7 @@ export default function AvailableFood() {
             <Leaf size={24} className="text-primary" />
             <h3 className="font-display text-xl text-textmain">Are you an NGO?</h3>
             <p className="text-textmuted text-sm max-w-md">
-              Register with AnnaSetu to claim these donations and get them delivered to those who need them most.
+              Register with AnnSetu to claim these donations and get them delivered to those who need them most.
             </p>
             <Link
               to="/register"

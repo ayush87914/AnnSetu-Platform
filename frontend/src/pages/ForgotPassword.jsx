@@ -32,7 +32,7 @@ export default function ForgotPassword() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="relative z-10 w-full max-w-md rounded-3xl bg-white/[0.03] backdrop-blur-md border border-white/10 p-8">
         <Link to="/" className="flex items-center gap-2 mb-8 w-fit">
           <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center"><Leaf size={16} className="text-primary" /></div>
-          <span className="font-display text-lg font-semibold text-textmain">Anna<span className="text-primary">Setu</span></span>
+          <span className="font-display text-lg font-semibold text-textmain">Ann<span className="text-primary">Setu</span></span>
         </Link>
         <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-5"><KeyRound size={24} className="text-primary" /></div>
         <h1 className="font-display text-3xl font-medium text-textmain mb-1">Forgot password?</h1>

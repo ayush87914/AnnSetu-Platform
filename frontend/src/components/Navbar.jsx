@@ -35,7 +35,7 @@ export default function Navbar() {
             <Leaf size={18} className="text-primary" />
           </div>
           <span className="font-display text-xl font-semibold text-textmain">
-            Anna<span className="text-primary">Setu</span>
+            Ann<span className="text-primary">Setu</span>
           </span>
         </div>
 

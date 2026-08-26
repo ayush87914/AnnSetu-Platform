@@ -83,7 +83,7 @@ export default function AdminDashboard() {
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0"><Leaf size={18} className="text-primary" /></div>
-            <span className="font-display text-lg font-semibold text-textmain">Anna<span className="text-primary">Setu</span> Admin</span>
+            <span className="font-display text-lg font-semibold text-textmain">Ann<span className="text-primary">Setu</span> Admin</span>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => setShowProfile(true)} className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full border border-white/10 hover:border-primary/40 transition-all" title="View profile">

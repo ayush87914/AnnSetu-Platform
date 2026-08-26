@@ -135,7 +135,7 @@ export default function VolunteerDashboard() {
               <Leaf size={18} className="text-primary" />
             </div>
             <span className="font-display text-lg font-semibold text-textmain">
-              Anna<span className="text-primary">Setu</span>
+              Ann<span className="text-primary">Setu</span>
             </span>
           </div>
 

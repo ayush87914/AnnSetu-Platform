@@ -1,6 +1,6 @@
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
 const SENDER_EMAIL = process.env.BREVO_SENDER_EMAIL;
-const SENDER_NAME = 'AnnaSetu';
+const SENDER_NAME = 'AnnSetu';
 
 const sendEmail = async (to, subject, html) => {
   const response = await fetch('https://api.brevo.com/v3/smtp/email', {
@@ -30,7 +30,7 @@ const sendEmail = async (to, subject, html) => {
 const sendOTPEmail = async (email, otp) => {
   await sendEmail(
     email,
-    'AnnaSetu - OTP Verification',
+    'AnnSetu - OTP Verification',
     `
       <h2>Your OTP Code</h2>
       <p>Your verification code is: <b style="font-size: 24px;">${otp}</b></p>
@@ -43,7 +43,7 @@ const sendOTPEmail = async (email, otp) => {
 const sendPasswordResetOTP = async (email, otp) => {
   await sendEmail(
     email,
-    'AnnaSetu - Password Reset Code',
+    'AnnSetu - Password Reset Code',
     `
       <h2>Password Reset Request</h2>
       <p>Your password reset code is: <b style="font-size: 24px;">${otp}</b></p>
@@ -56,7 +56,7 @@ const sendPasswordResetOTP = async (email, otp) => {
 const sendPasswordResetConfirmation = async (email, name) => {
   await sendEmail(
     email,
-    'AnnaSetu - Password Changed Successfully',
+    'AnnSetu - Password Changed Successfully',
     `
       <h2>Hi ${name},</h2>
       <p>Your password has been reset successfully.</p>
@@ -69,10 +69,10 @@ const sendPasswordResetConfirmation = async (email, name) => {
 const sendLoginAlert = async (email, name) => {
   await sendEmail(
     email,
-    'AnnaSetu - New Login Detected',
+    'AnnSetu - New Login Detected',
     `
       <h2>Hi ${name},</h2>
-      <p>You have successfully logged in to your AnnaSetu account.</p>
+      <p>You have successfully logged in to your AnnSetu account.</p>
       <p>If this wasn't you, please reset your password immediately.</p>
     `
   );
@@ -82,11 +82,11 @@ const sendLoginAlert = async (email, name) => {
 const sendApprovalEmail = async (email, name) => {
   await sendEmail(
     email,
-    'AnnaSetu - Account Approved! 🎉',
+    'AnnSetu - Account Approved! 🎉',
     `
       <h2>Congratulations, ${name}!</h2>
       <p>Your application has been reviewed and <b>accepted</b> by our team.</p>
-      <p>You can now log in and start using AnnaSetu.</p>
+      <p>You can now log in and start using AnnSetu.</p>
     `
   );
 };
@@ -95,7 +95,7 @@ const sendApprovalEmail = async (email, name) => {
 const sendRejectionEmail = async (email, name) => {
   await sendEmail(
     email,
-    'AnnaSetu - Application Update',
+    'AnnSetu - Application Update',
     `
       <h2>Hi ${name},</h2>
       <p>We're sorry to inform you that your application was not approved at this time.</p>

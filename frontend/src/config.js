@@ -1,1 +1,1 @@
-export const API_URL = 'https://annasetu-backend-q04t.onrender.com';
+export const API_URL = 'https://Annsetu-backend-q04t.onrender.com';
