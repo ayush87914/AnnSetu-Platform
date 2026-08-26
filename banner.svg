@@ -1,0 +1,65 @@
+<svg width="1200" height="400" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f2f1f"/>
+      <stop offset="55%" stop-color="#166534"/>
+      <stop offset="100%" stop-color="#3f8a3a"/>
+    </linearGradient>
+    <linearGradient id="bowlGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffb703"/>
+      <stop offset="100%" stop-color="#fb8500"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="1200" height="400" fill="url(#bg)"/>
+  <rect width="1200" height="400" fill="url(#glow)"/>
+
+  <!-- soft decorative leaf circles -->
+  <circle cx="1080" cy="70" r="120" fill="#ffffff" opacity="0.05"/>
+  <circle cx="90" cy="340" r="150" fill="#ffffff" opacity="0.05"/>
+  <circle cx="1150" cy="360" r="70" fill="#ffd166" opacity="0.08"/>
+
+  <!-- leaf motif top-left -->
+  <g transform="translate(60,50)" opacity="0.9">
+    <path d="M0 40 C 10 0, 60 -10, 80 20 C 60 25, 30 20, 0 40 Z" fill="#8fd694" opacity="0.35"/>
+  </g>
+
+  <!-- hands + bowl illustration -->
+  <g transform="translate(150,150)">
+    <!-- bowl -->
+    <path d="M0 60 Q75 130 150 60 L150 60 Q150 100 75 100 Q0 100 0 60 Z" fill="url(#bowlGrad)"/>
+    <ellipse cx="75" cy="60" rx="75" ry="26" fill="#ffe08a"/>
+    <ellipse cx="75" cy="58" rx="60" ry="18" fill="#fff3d1"/>
+    <!-- rising steam -->
+    <path d="M50 30 Q45 10 55 -5" stroke="#ffffff" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <path d="M75 30 Q70 5 80 -12" stroke="#ffffff" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <path d="M100 30 Q95 10 105 -5" stroke="#ffffff" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <!-- supporting hands -->
+    <path d="M-25 95 Q10 60 75 95 Q140 60 175 95 Q175 130 75 140 Q-25 130 -25 95 Z" fill="#f4a259"/>
+    <path d="M-25 95 Q10 60 75 95 Q140 60 175 95" fill="none" stroke="#c9782f" stroke-width="4" opacity="0.5"/>
+  </g>
+
+  <!-- text -->
+  <text x="420" y="185" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" fill="#ffffff">AnnSetu</text>
+  <text x="422" y="230" font-family="Verdana, Arial, sans-serif" font-size="24" fill="#d8f3dc" letter-spacing="1">Don't Waste Food, Feed Lives</text>
+
+  <!-- divider -->
+  <rect x="422" y="252" width="120" height="4" rx="2" fill="#ffb703"/>
+
+  <!-- tag pills -->
+  <g font-family="Verdana, Arial, sans-serif" font-size="16" fill="#0f2f1f">
+    <rect x="422" y="280" width="118" height="34" rx="17" fill="#ffffff" opacity="0.92"/>
+    <text x="440" y="302">Restaurants</text>
+
+    <rect x="552" y="280" width="70" height="34" rx="17" fill="#ffffff" opacity="0.92"/>
+    <text x="570" y="302">NGOs</text>
+
+    <rect x="634" y="280" width="112" height="34" rx="17" fill="#ffffff" opacity="0.92"/>
+    <text x="650" y="302">Volunteers</text>
+  </g>
+</svg>

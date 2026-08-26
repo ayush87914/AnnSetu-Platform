@@ -1,16 +1,16 @@
-# 🌿 AnnaSetu — Don't Waste Food, Feed Lives
+# 🌿 AnnSetu — Don't Waste Food, Feed Lives
 
-AnnaSetu is a full-stack food donation platform that connects restaurants with surplus food to NGOs and volunteers, turning what would be wasted into meals for those who need them most.
+AnnSetu is a full-stack food donation platform that connects restaurants with surplus food to NGOs and volunteers, turning what would be wasted into meals for those who need them most.
 
-**🔗 Live Demo:** [food-donation-platform-three.vercel.app](https://food-donation-platform-three.vercel.app)
+**🔗 Live Demo:** [annsetu-app.vercel.app](https://annsetu-app.vercel.app)
 
-![AnnaSetu Banner](https://via.placeholder.com/1200x600?text=AnnaSetu+Screenshot)
+![AnnSetu Banner](./banner.svg)
 
 ---
 
 ## 📖 Overview
 
-Every day, tons of good food goes to waste while people go hungry. AnnaSetu bridges this gap by creating a transparent, verified workflow connecting four types of users — **Restaurants**, **NGOs**, **Volunteers**, and **Admins** — to ensure surplus food reaches those who need it, safely and efficiently.
+Every day, tons of good food goes to waste while people go hungry. AnnSetu bridges this gap by creating a transparent, verified workflow connecting four types of users — **Restaurants**, **NGOs**, **Volunteers**, and **Admins** — to ensure surplus food reaches those who need it, safely and efficiently.
 
 ## ✨ Key Features
 
@@ -26,7 +26,7 @@ Every day, tons of good food goes to waste while people go hungry. AnnaSetu brid
 - Interactive map-based pickup location selection (Leaflet.js)
 - NGOs discover nearby donations sorted by distance (Haversine formula) with list/map toggle
 - Volunteers claim pickup tasks and manage deliveries
-- **Two-step OTP verification** — restaurant confirms pickup, NGO confirms delivery, ensuring end-to-end accountability
+- **Two-step OTP verification** - restaurant confirms pickup, NGO confirms delivery, ensuring end-to-end accountability
 
 ### ⭐ Ratings & Feedback
 - NGOs rate restaurants and volunteers after successful delivery
@@ -36,7 +36,7 @@ Every day, tons of good food goes to waste while people go hungry. AnnaSetu brid
 - Public, real-time statistics pulled directly from the database (restaurants onboard, meals delivered, active volunteers)
 
 ### 🌍 Public Pages
-- Available Food page — anyone can view live pending donations without logging in
+- Available Food page - anyone can view live pending donations without logging in
 - Fully responsive landing page with animated hero section
 
 ### 👤 Profile Management
@@ -77,7 +77,7 @@ Every day, tons of good food goes to waste while people go hungry. AnnaSetu brid
 - **Distance-based matching engine** using the Haversine formula to sort donations by proximity for NGOs
 - **Two-step OTP verification** system for both pickup and delivery, preventing fraud and ensuring accountability at every handoff
 - **Role-based access control** enforced via middleware on both API routes and frontend route guards
-- **Non-blocking email architecture** — email failures never block core user actions like login or registration
+- **Non-blocking email architecture** - email failures never block core user actions like login or registration
 
 ---
 
@@ -127,7 +127,7 @@ npm run dev
 
 ## 👨‍💻 Author
 
-Built by **Ayush** as a full-stack learning project — covering authentication, real-time-style workflows, geolocation, email integration, and full deployment.
+Built by **Ayush** as a full-stack learning project - covering authentication, real-time-style workflows, geolocation, email integration, and full deployment.
 
 ---
 
