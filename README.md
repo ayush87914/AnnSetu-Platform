@@ -121,7 +121,7 @@ npm run dev
 
 ## 📸 Screenshots
 
-*(Add screenshots of your landing page, dashboards, and mobile view here)*
+![AnnSetu LandingPage](./landingpage.png)
 
 ---
 
